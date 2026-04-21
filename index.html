@@ -1520,10 +1520,13 @@ async function fbLeer(key){
 async function sincronizarDesdeFirebase(){
   console.log('Sincronizando desde Firebase...');
   for(const key of COLECCIONES){
-    const data = await fbLeer(key);
-    if(data !== null){
-      localStorage.setItem(key, JSON.stringify(data));
-    }
+    try {
+      const data = await fbLeer(key);
+      if(data !== null){
+        // Use _origSetItem to avoid triggering the override loop
+        _origSetItem(key, JSON.stringify(data));
+      }
+    } catch(e){ console.warn('Error leyendo '+key, e); }
   }
   console.log('Sincronización completa.');
 }
@@ -1551,11 +1554,11 @@ sincronizarDesdeFirebase().then(()=>{
   }
   // Show sync indicator
   const ind = document.getElementById('fbSyncIndicator');
-  if(ind){ ind.textContent = '✓ Sincronizado'; ind.style.color='#065f46'; setTimeout(()=>{ ind.textContent=''; },3000); }
+  if(ind){ ind.textContent = '✓ Firebase OK'; ind.style.color='#065f46'; setTimeout(()=>{ ind.textContent=''; },4000); }
 }).catch(e=>{ 
-  console.warn('Firebase sync failed:', e);
   const ind = document.getElementById('fbSyncIndicator');
-  if(ind){ ind.textContent = '⚠ Sin conexión'; ind.style.color='#991b1b'; }
+  if(ind){ ind.textContent = '⚠ Sin Firebase'; ind.style.color='#991b1b'; }
+  console.warn('Firebase sync failed:', e);
 });
 
 window._fbGuardar = fbGuardar;
