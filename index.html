@@ -1050,6 +1050,18 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   </div>
 </div>
 
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:24px;width:90%;max-width:360px;font-family:'Segoe UI',Arial,sans-serif;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+    <div style="font-size:32px;margin-bottom:10px">⚠️</div>
+    <div id="confirmMsg" style="font-size:15px;color:#1a1a2e;font-weight:500;margin-bottom:20px;line-height:1.4"></div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="resolverConfirm(false)" style="flex:1;padding:10px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="resolverConfirm(true)" style="flex:1;padding:10px;border-radius:8px;border:none;background:#ef4444;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- SYNC MODAL -->
 <input type="file" id="csvInput" accept=".csv" style="display:none" onchange="procesarCSV(event)">
 <div id="syncModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center">
