@@ -255,7 +255,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
 <div id="loginScreen" style="display:flex;position:fixed;inset:0;background:#ffffff;z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px">
   <img id="loginLogo" src="" alt="Skycom Studio" style="height:72px;margin-bottom:4px">
   <div style="text-align:center">
-    <h1 style="color:#1a1a2e;font-size:22px;font-weight:700;margin-bottom:4px">Skycom CRM</h1>
+    <h1 style="color:#1a1a2e;font-size:22px;font-weight:700;margin-bottom:4px">SKYCOM Login</h1>
     <p style="color:#9b8fc0;font-size:13px">Ingresá con tu usuario y contraseña</p>
   </div>
   <div style="background:#fff;border:1px solid #e4e0ef;border-radius:12px;padding:28px;width:90%;max-width:360px">
@@ -288,6 +288,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
     </div>
     <button onclick="toggleDark()" id="btnDark" title="Modo oscuro" style="background:none;border:1px solid #d8d2ea;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px">🌙</button>
     <span id="fbSyncIndicator" style="font-size:11px;color:#9b8fc0;margin-right:8px"></span><span id="userInfo" style="font-size:13px;color:#9b8fc0;margin-right:4px"></span>
+    <button class="btn" onclick="abrirPapelera()" style="font-size:13px" title="Papelera">🗑 Papelera</button>
     <button class="btn" onclick="hacerBackup()" style="font-size:13px" title="Descargar backup completo">💾 Backup</button>
     <button class="btn" onclick="document.getElementById('restoreInput').click()" style="font-size:13px" title="Restaurar desde backup">↩ Restaurar</button>
     <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restaurarBackup(event)">
@@ -301,6 +302,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
 <div class="tabs">
   <div class="tab active" onclick="setTab('inventario',this)">Inventario</div>
   <div class="tab" onclick="setTab('ventas',this)">Ventas</div>
+  <div class="tab" onclick="setTab('produccion',this)">🏭 Producción</div>
   <div class="tab" onclick="setTab('clientes',this)">Clientes</div>
   <div class="tab" onclick="setTab('distribuidores',this)">Distribuidores</div>
   <div class="tab" onclick="setTab('filamentos',this)">Filamentos</div>
@@ -409,6 +411,107 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
 
 <!-- FILAMENTOS PANEL -->
 <!-- CLIENTES PANEL -->
+<!-- PRODUCCION PANEL -->
+<div class="panel" id="tab-produccion">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <div class="sum-grid" id="prodSumGrid" style="flex:1"></div>
+    <button class="btn btn-purple" onclick="abrirNuevoTrabajo()">+ Nuevo trabajo</button>
+  </div>
+
+  <!-- Kanban -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px" id="prodKanban">
+    <!-- Col En cola -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b"></div>
+        <span style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em">En cola</span>
+        <span id="prodBadgeCola" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#fef3c7;color:#92400e;font-weight:600">0</span>
+      </div>
+      <div id="prodColCola" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('cola')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #fcd34d;border-radius:8px;background:transparent;color:#92400e;font-size:12px;cursor:pointer">+ Agregar en cola</button>
+    </div>
+    <!-- Col En producción -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#7b4fc9"></div>
+        <span style="font-size:12px;font-weight:700;color:#4a1fa8;text-transform:uppercase;letter-spacing:.06em">En producción</span>
+        <span id="prodBadgeProd" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#f0edf8;color:#7b4fc9;font-weight:600">0</span>
+      </div>
+      <div id="prodColProd" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('produccion')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #c4b5fd;border-radius:8px;background:transparent;color:#7b4fc9;font-size:12px;cursor:pointer">+ Agregar en producción</button>
+    </div>
+    <!-- Col Producido -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#10b981"></div>
+        <span style="font-size:12px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.06em">Producido</span>
+        <span id="prodBadgeListo" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#d1fae5;color:#065f46;font-weight:600">0</span>
+      </div>
+      <div id="prodColListo" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('producido')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #6ee7b7;border-radius:8px;background:transparent;color:#065f46;font-size:12px;cursor:pointer">+ Agregar producido</button>
+    </div>
+  </div>
+
+  <!-- Mobile: lista vertical -->
+  <div id="prodMobile" style="display:none;flex-direction:column;gap:12px"></div>
+</div>
+
+<!-- TRABAJO MODAL -->
+<div id="trabajoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+  <div style="background:#fff;border-radius:16px;padding:26px;width:92%;max-width:480px;margin:auto;font-family:'Segoe UI',Arial,sans-serif" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h2 id="trabajoModalTitulo" style="font-size:17px;font-weight:700;color:#1a1a2e">Nuevo trabajo</h2>
+      <button onclick="cerrarTrabajoModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Descripción *</label>
+        <input type="text" id="tjDesc" placeholder="Ej: Copa del Mundo x2 — PLA Rojo" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Cliente</label>
+        <input type="text" id="tjCliente" placeholder="Nombre del cliente" list="tjClienteList" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+        <datalist id="tjClienteList"></datalist>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Estado</label>
+          <select id="tjEstado" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+            <option value="cola">En cola</option>
+            <option value="produccion">En producción</option>
+            <option value="producido">Producido</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Prioridad</label>
+          <select id="tjPrioridad" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+            <option value="normal">Normal</option>
+            <option value="urgente">🔴 Urgente</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Vincular a venta (opcional)</label>
+        <select id="tjVenta" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+          <option value="">— Sin venta vinculada —</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Notas</label>
+        <textarea id="tjNotas" rows="2" placeholder="Ej: usar 0.2mm, color especial, el cliente pidió acabado mate..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="tjBtnEliminar" onclick="eliminarTrabajo()" style="display:none;padding:9px 16px;border-radius:8px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:600;cursor:pointer">Eliminar</button>
+      <button onclick="cerrarTrabajoModal()" style="padding:9px 16px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="guardarTrabajo()" style="padding:9px 20px;border-radius:8px;border:none;background:#7b4fc9;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="tab-clientes">
   <div class="sum-grid" id="clientesSumGrid" style="margin-bottom:20px"></div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
@@ -1157,7 +1260,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
 
     <!-- LEFT: Form -->
-    <div style="flex:1;min-width:280px;max-width:420px">
+    <div style="flex:1;min-width:280px;max-width:420px;position:relative;z-index:1">
       <h3 style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:16px">Armar presupuesto</h3>
 
       <!-- Cliente -->
@@ -1218,7 +1321,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
     </div>
 
     <!-- RIGHT: Preview -->
-    <div style="flex:1;min-width:300px">
+    <div style="flex:1;min-width:300px;position:relative;z-index:1">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">Vista previa</h3>
       </div>
@@ -1233,13 +1336,27 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
 
       <!-- Presupuestos guardados -->
       <div style="margin-top:24px">
-        <div style="font-size:12px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Presupuestos guardados</div>
+        <div style="font-size:12px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">💾 Guardados</div>
         <div id="pqHistorial" style="display:flex;flex-direction:column;gap:8px">
           <div style="font-size:13px;color:#bbb;text-align:center;padding:12px">Sin presupuestos guardados aún</div>
         </div>
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- PAPELERA MODAL -->
+<div id="papeleraModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+  <div style="background:#fff;border-radius:16px;width:92%;max-width:560px;margin:auto;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden" onclick="event.stopPropagation()">
+    <div style="padding:20px 24px;border-bottom:1px solid #f0edf8;display:flex;align-items:center;justify-content:space-between">
+      <h2 style="font-size:17px;font-weight:700;color:#1a1a2e">🗑 Papelera</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="vaciarPapelera()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;cursor:pointer;font-weight:600">Vaciar todo</button>
+        <button onclick="cerrarPapelera()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
+      </div>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto" id="papeleraLista"></div>
   </div>
 </div>
 
@@ -1384,7 +1501,7 @@ const db = getFirestore(firebaseApp);
 
 // ===== FIREBASE SYNC =====
 // All collections stored as single documents for simplicity
-const COLECCIONES = ['skycom_ventas','skycom_clientes','skycom_filamentos_v2','skycom_movimientos_fil','skycom_fils_v3','skycom_movs_v3','skycom_usuarios','skycom_inv2','skycom_consigs','skycom_presupuestos'];
+const COLECCIONES = ['skycom_ventas','skycom_clientes','skycom_filamentos_v2','skycom_movimientos_fil','skycom_fils_v3','skycom_movs_v3','skycom_usuarios','skycom_inv2','skycom_consigs','skycom_presupuestos','skycom_trabajos','skycom_papelera'];
 
 async function fbGuardar(key, data){
   try {
@@ -1530,6 +1647,7 @@ function setTab(id, el){
   if(id==='ventas') renderVentas();
   if(id==='clientes') renderClientes();
   if(id==='distribuidores') renderDistribuidores();
+  if(id==='produccion') renderProduccion();
   if(id==='presupuesto') initPresupuesto();
 }
 
@@ -2517,7 +2635,9 @@ function guardarVenta(){
 }
 
 async function eliminarVenta(){
-  if(!await pedirConfirm('¿Eliminar esta venta? No se puede deshacer.')) return;
+  if(!await pedirConfirm('¿Mover esta venta a la papelera?')) return;
+  const venta = getVentas().find(v=>v.id===ventaEditId);
+  if(venta) enviarAPapelera('venta', venta);
   saveVentas(getVentas().filter(v=>v.id!==ventaEditId));
   cerrarVentaModal();
   renderVentas();
@@ -3515,6 +3635,282 @@ function setTabById(id){
 }
 
 
+// ===== PRODUCCIÓN =====
+function getTrabajos(){ return JSON.parse(localStorage.getItem('skycom_trabajos')||'[]'); }
+function saveTrabajos(a){ localStorage.setItem('skycom_trabajos',JSON.stringify(a)); }
+
+let trabajoEditId=null;
+
+const PROD_ESTADOS={
+  'cola':   {col:'prodColCola',  badge:'prodBadgeCola',  bg:'#fef3c7',fg:'#92400e',label:'En cola'},
+  'produccion':{col:'prodColProd',badge:'prodBadgeProd', bg:'#f0edf8',fg:'#7b4fc9',label:'En producción'},
+  'producido': {col:'prodColListo',badge:'prodBadgeListo',bg:'#d1fae5',fg:'#065f46',label:'Producido'}
+};
+
+function renderProduccion(){
+  const trabajos=getTrabajos();
+
+  // Summary
+  const cola=trabajos.filter(t=>t.estado==='cola').length;
+  const prod=trabajos.filter(t=>t.estado==='produccion').length;
+  const listo=trabajos.filter(t=>t.estado==='producido').length;
+  document.getElementById('prodSumGrid').innerHTML=
+    '<div class="sum-card"><div class="sum-label">En cola</div><div class="sum-val" style="color:#92400e">'+cola+'</div></div>'+
+    '<div class="sum-card"><div class="sum-label">En producción</div><div class="sum-val" style="color:#7b4fc9">'+prod+'</div></div>'+
+    '<div class="sum-card"><div class="sum-label">Producidos</div><div class="sum-val" style="color:#065f46">'+listo+'</div></div>';
+
+  // Update badges
+  document.getElementById('prodBadgeCola').textContent=cola;
+  document.getElementById('prodBadgeProd').textContent=prod;
+  document.getElementById('prodBadgeListo').textContent=listo;
+
+  // Clear columns
+  ['prodColCola','prodColProd','prodColListo'].forEach(id=>document.getElementById(id).innerHTML='');
+
+  // Sort: urgente first, then by id desc
+  const sorted=[...trabajos].sort((a,b)=>{
+    if(a.prioridad==='urgente'&&b.prioridad!=='urgente') return -1;
+    if(b.prioridad==='urgente'&&a.prioridad!=='urgente') return 1;
+    return b.id-a.id;
+  });
+
+  // Render each
+  sorted.forEach(t=>{
+    const cfg=PROD_ESTADOS[t.estado]||PROD_ESTADOS.cola;
+    const venta=t.ventaId?getVentas().find(v=>v.id===t.ventaId):null;
+    const urgente=t.prioridad==='urgente';
+
+    const card=document.createElement('div');
+    card.style.cssText='background:#fff;border:1px solid #e4e0ef;border-radius:10px;padding:12px 14px;cursor:pointer;'+(urgente?'border-left:3px solid #ef4444;':'');
+    card.innerHTML=
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">'+
+        '<div style="font-size:13px;font-weight:600;color:#1a1a2e;line-height:1.3;flex:1">'+
+          (urgente?'🔴 ':'')+t.desc+
+        '</div>'+
+        '<button onclick="event.stopPropagation();avanzarTrabajo('+t.id+')" title="Avanzar estado" style="margin-left:6px;background:#7b4fc9;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap">→ Avanzar</button>'+
+      '</div>'+
+      (t.cliente?'<div style="font-size:12px;color:#9b8fc0;margin-bottom:4px">👤 '+t.cliente+'</div>':'')+
+      (venta?'<div style="font-size:11px;color:#7b4fc9;background:#f5f0ff;padding:2px 7px;border-radius:6px;display:inline-block;margin-bottom:4px;cursor:pointer" onclick="event.stopPropagation();irAVenta('+venta.id+')">'+(venta.source==='tiendanube'?'#':'S')+venta.id+' — '+venta.nombre+'</div>':'')+
+      (t.notas?'<div style="font-size:11px;color:#555;margin-top:4px;line-height:1.4">📝 '+t.notas+'</div>':'')+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">'+
+        '<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:'+cfg.bg+';color:'+cfg.fg+';font-weight:600">'+cfg.label+'</span>'+
+        '<span style="font-size:10px;color:#bbb">'+( t.fecha||'')+'</span>'+
+      '</div>';
+
+    card.onclick=()=>abrirEditarTrabajo(t.id);
+    document.getElementById(cfg.col).appendChild(card);
+  });
+
+  // Mobile check
+  const isMobile=window.innerWidth<640;
+  document.getElementById('prodKanban').style.display=isMobile?'none':'grid';
+  document.getElementById('prodMobile').style.display=isMobile?'flex':'none';
+}
+
+function avanzarTrabajo(id){
+  const trabajos=getTrabajos();
+  const idx=trabajos.findIndex(t=>t.id===id);
+  if(idx<0) return;
+  const orden=['cola','produccion','producido'];
+  const actual=trabajos[idx].estado||'cola';
+  const siguiente=orden[(orden.indexOf(actual)+1)%orden.length];
+  trabajos[idx].estado=siguiente;
+  saveTrabajos(trabajos);
+  renderProduccion();
+  mostrarResultado('Estado: '+PROD_ESTADOS[siguiente].label,'ok');
+}
+
+function irAVenta(ventaId){
+  const tab=[...document.querySelectorAll('.tab')].find(t=>t.textContent.trim()==='Ventas');
+  if(tab) tab.click();
+  setTimeout(()=>abrirEditarVenta(ventaId),300);
+}
+
+function poblarSelectVentas(){
+  const sel=document.getElementById('tjVenta');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— Sin venta vinculada —</option>';
+  const ventas=getVentas().slice().reverse().slice(0,50);
+  ventas.forEach(v=>{
+    const opt=document.createElement('option');
+    opt.value=v.id;
+    opt.textContent=(v.source==='tiendanube'?'#':'S')+v.id+' — '+v.nombre+' ('+v.fecha+')';
+    sel.appendChild(opt);
+  });
+}
+
+function abrirNuevoTrabajoEstado(estado){
+  abrirNuevoTrabajo();
+  setTimeout(()=>document.getElementById('tjEstado').value=estado,50);
+}
+function abrirNuevoTrabajo(){
+  trabajoEditId=null;
+  document.getElementById('trabajoModalTitulo').textContent='Nuevo trabajo';
+  document.getElementById('tjBtnEliminar').style.display='none';
+  document.getElementById('tjDesc').value='';
+  document.getElementById('tjCliente').value='';
+  document.getElementById('tjEstado').value='cola';
+  document.getElementById('tjPrioridad').value='normal';
+  document.getElementById('tjNotas').value='';
+  // Populate cliente datalist
+  const dl=document.getElementById('tjClienteList');
+  dl.innerHTML=getClientes().filter(c=>(c.tipo||'cliente')==='cliente').map(c=>'<option value="'+c.nombre+'">').join('');
+  poblarSelectVentas();
+  document.getElementById('trabajoModal').style.display='flex';
+  setTimeout(()=>document.getElementById('tjDesc').focus(),100);
+}
+
+function abrirEditarTrabajo(id){
+  const t=getTrabajos().find(x=>x.id===id);
+  if(!t) return;
+  trabajoEditId=id;
+  document.getElementById('trabajoModalTitulo').textContent='Editar trabajo';
+  document.getElementById('tjBtnEliminar').style.display='inline-block';
+  document.getElementById('tjDesc').value=t.desc||'';
+  document.getElementById('tjCliente').value=t.cliente||'';
+  document.getElementById('tjEstado').value=t.estado||'cola';
+  document.getElementById('tjPrioridad').value=t.prioridad||'normal';
+  document.getElementById('tjNotas').value=t.notas||'';
+  const dl=document.getElementById('tjClienteList');
+  dl.innerHTML=getClientes().filter(c=>(c.tipo||'cliente')==='cliente').map(c=>'<option value="'+c.nombre+'">').join('');
+  poblarSelectVentas();
+  setTimeout(()=>{
+    const sel=document.getElementById('tjVenta');
+    if(sel&&t.ventaId) sel.value=t.ventaId;
+  },50);
+  document.getElementById('trabajoModal').style.display='flex';
+}
+
+function cerrarTrabajoModal(){ document.getElementById('trabajoModal').style.display='none'; }
+
+function guardarTrabajo(){
+  const desc=document.getElementById('tjDesc').value.trim();
+  if(!desc){ alert('La descripción es obligatoria'); return; }
+  const trabajos=getTrabajos();
+  const nextId=trabajos.length?Math.max(...trabajos.map(t=>t.id))+1:1;
+  const ventaId=parseInt(document.getElementById('tjVenta').value)||null;
+  const trabajo={
+    id:trabajoEditId||nextId,
+    desc,
+    cliente:document.getElementById('tjCliente').value.trim(),
+    estado:document.getElementById('tjEstado').value,
+    prioridad:document.getElementById('tjPrioridad').value,
+    notas:document.getElementById('tjNotas').value.trim(),
+    ventaId,
+    fecha:new Date().toLocaleDateString('es-AR')
+  };
+  if(trabajoEditId){
+    const idx=trabajos.findIndex(t=>t.id===trabajoEditId);
+    if(idx>=0) trabajos[idx]=trabajo;
+  } else {
+    trabajos.push(trabajo);
+  }
+  saveTrabajos(trabajos);
+  cerrarTrabajoModal();
+  renderProduccion();
+  mostrarResultado((trabajoEditId?'Trabajo actualizado':'Trabajo agregado')+'.','ok');
+}
+
+async function eliminarTrabajo(){
+  if(!await pedirConfirm('¿Eliminar este trabajo?')) return;
+  saveTrabajos(getTrabajos().filter(t=>t.id!==trabajoEditId));
+  cerrarTrabajoModal();
+  renderProduccion();
+}
+
+
+// ===== PAPELERA =====
+function getPapelera(){ return JSON.parse(localStorage.getItem('skycom_papelera')||'[]'); }
+function savePapelera(a){ localStorage.setItem('skycom_papelera',JSON.stringify(a)); }
+
+function enviarAPapelera(tipo, item){
+  const papelera = getPapelera();
+  papelera.unshift({
+    id: Date.now(),
+    tipo,
+    item: JSON.parse(JSON.stringify(item)),
+    fechaEliminado: new Date().toLocaleDateString('es-AR'),
+    tsEliminado: Date.now()
+  });
+  // Keep max 100 items
+  if(papelera.length > 100) papelera.splice(100);
+  savePapelera(papelera);
+}
+
+function renderPapelera(){
+  const papelera = getPapelera();
+  const el = document.getElementById('papeleraLista');
+  if(!el) return;
+  if(!papelera.length){
+    el.innerHTML='<div style="text-align:center;padding:30px;color:#bbb;font-size:14px">🗑 La papelera está vacía</div>';
+    return;
+  }
+  el.innerHTML = papelera.map(p=>{
+    const esTipo = p.tipo==='venta' ? '🛒 Venta' : p.tipo==='usuario' ? '👤 Usuario' : '📦 '+p.tipo;
+    const nombre = p.tipo==='venta' ? (p.item.nombre+' — '+(p.item.source==='tiendanube'?'#':'S')+p.item.id) :
+                   p.tipo==='usuario' ? p.item.nombre+' ('+p.item.email+')' : p.item.nombre||'';
+    return '<div style="background:#fff;border:1px solid #e4e0ef;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px">'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'+
+          '<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:#f5f5f5;color:#555;font-weight:600">'+esTipo+'</span>'+
+          '<span style="font-size:11px;color:#9b8fc0">'+p.fechaEliminado+'</span>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nombre+'</div>'+
+        (p.tipo==='venta'&&p.item.total?'<div style="font-size:12px;color:#9b8fc0">'+fmt(p.item.total)+'</div>':'')+
+      '</div>'+
+      '<div style="display:flex;gap:6px;flex-shrink:0">'+
+        '<button onclick="restaurarDePapelera('+p.id+')" style="padding:5px 12px;border-radius:6px;border:1px solid #6ee7b7;background:#d1fae5;color:#065f46;font-size:12px;font-weight:600;cursor:pointer">↩ Restaurar</button>'+
+        '<button onclick="eliminarDePapelera('+p.id+')" style="padding:5px 10px;border-radius:6px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:12px;cursor:pointer">🗑</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function restaurarDePapelera(id){
+  const papelera = getPapelera();
+  const idx = papelera.findIndex(p=>p.id===id);
+  if(idx<0) return;
+  const entry = papelera[idx];
+  if(entry.tipo==='venta'){
+    const ventas = getVentas();
+    // Avoid duplicate
+    if(!ventas.find(v=>v.id===entry.item.id)) ventas.push(entry.item);
+    saveVentas(ventas);
+    mostrarResultado('Venta restaurada.','ok');
+  } else if(entry.tipo==='usuario'){
+    const lista = getUsuarios();
+    if(!lista.find(u=>u.email===entry.item.email)) lista.push(entry.item);
+    saveUsuarios(lista);
+    mostrarResultado('Usuario '+entry.item.nombre+' restaurado.','ok');
+  }
+  papelera.splice(idx,1);
+  savePapelera(papelera);
+  renderPapelera();
+}
+
+async function eliminarDePapelera(id){
+  if(!await pedirConfirm('¿Eliminar definitivamente? Esta acción no se puede deshacer.')) return;
+  savePapelera(getPapelera().filter(p=>p.id!==id));
+  renderPapelera();
+  mostrarResultado('Eliminado definitivamente.','ok');
+}
+
+async function vaciarPapelera(){
+  if(!await pedirConfirm('¿Vaciar toda la papelera? Se perderán todos los items definitivamente.')) return;
+  savePapelera([]);
+  renderPapelera();
+  mostrarResultado('Papelera vaciada.','ok');
+}
+
+
+function abrirPapelera(){
+  renderPapelera();
+  document.getElementById('papeleraModal').style.display='flex';
+}
+function cerrarPapelera(){
+  document.getElementById('papeleraModal').style.display='none';
+}
+
 render();
 calcularCosto();
 initDarkMode();
@@ -3925,10 +4321,11 @@ async function usuarioAccion(btn){
     saveUsuarios(lista);
     mostrarResultado('Usuario '+u.nombre+' '+(lista[idx].deshabilitado?'deshabilitado':'habilitado')+'.','ok');
   } else if(accion==='eliminar'){
-    if(!await pedirConfirm('¿Eliminar a '+u.nombre+'? No se puede deshacer.')) return;
+    if(!await pedirConfirm('¿Mover a '+u.nombre+' a la papelera?')) return;
+    enviarAPapelera('usuario', u);
     lista.splice(idx,1);
     saveUsuarios(lista);
-    mostrarResultado('Usuario eliminado.','ok');
+    mostrarResultado('Usuario movido a la papelera.','ok');
   }
   renderUsuariosPanel();
 }
