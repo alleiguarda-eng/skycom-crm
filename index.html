@@ -3942,7 +3942,7 @@ function procesarCSV(e){
     );
     e.target.value='';
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsText(file, 'ISO-8859-1');
 }
 
 function detectarCategoria(href, nombre){
