@@ -39,6 +39,14 @@ body.dark #globalSearchBox{background:#1a1a2e;border-color:#3a3a55;color:#e2e0f0
 body.dark #globalSearchResults{background:#1a1a2e;border-color:#3a3a55}
 body.dark .gs-item:hover{background:#2a2a40}
 
+/* PRODUCCION KANBAN RESPONSIVE */
+@media(max-width:640px){
+  .prod-kanban{ grid-template-columns:1fr !important; }
+}
+@media(min-width:641px) and (max-width:900px){
+  .prod-kanban{ grid-template-columns:1fr 1fr !important; }
+}
+
 /* GLOBAL SEARCH */
 #globalSearchWrap{position:relative;flex:1;max-width:320px}
 #globalSearchBox{width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:7px 12px 7px 32px;font-size:13px;outline:none;background:#fff;transition:border .2s}
@@ -353,202 +361,6 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   <div id="catView"></div>
 </div>
 
-<!-- RENTABILIDAD -->
-<div class="panel" id="tab-rentabilidad">
-  <div class="rent-grid" id="rentGrid"></div>
-  <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Productos más valiosos (precio público)</h3>
-  <div id="topProds"></div>
-</div>
-
-<!-- CALCULADORA -->
-<div class="panel" id="tab-calculadora">
-  <div class="calc-box">
-    <h3>Calculadora de precio desde costo</h3>
-    <div class="calc-row"><label>Horas de impresión</label><input type="number" id="cHoras" value="4" min="0.1" step="0.5" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">hs</span></div>
-    <div class="calc-row"><label>Filamento usado</label><input type="number" id="cGramos" value="80" min="1" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">gramos</span></div>
-    <div class="calc-row"><label>Precio filamento (kg)</label><input type="number" id="cFilamento" value="25000" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$/kg</span></div>
-    <div class="calc-row"><label>Consumo impresora</label><input type="number" id="cWatts" value="200" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">watts</span></div>
-    <div class="calc-row"><label>Precio kWh</label><input type="number" id="cKwh" value="227" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$/kWh</span></div>
-    <div class="calc-row"><label>Gastos adicionales</label><input type="number" id="cExtras" value="0" min="0" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$</span></div>
-    <div style="border-top:1px solid #f0edf8;margin:12px 0"></div>
-    <div style="font-size:12px;color:#9b8fc0;margin-bottom:8px">Desglose:</div>
-    <div id="cDesglose" style="font-size:13px;color:#555;line-height:2;background:#fafafa;border-radius:8px;padding:10px 14px;margin-bottom:10px"></div>
-
-    <!-- Precio público -->
-    <div class="calc-result" style="max-width:560px">
-      <div>
-        <div class="r-label">Precio sugerido de venta</div>
-        <div style="font-size:12px;color:#9b8fc0;margin-top:2px" id="cFormula"></div>
-      </div>
-      <div class="r-val" id="cResultado">$0</div>
-    </div>
-
-    <!-- Toggle distribuidor -->
-    <div style="max-width:560px;margin-top:10px;background:#f5f0ff;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:#7b4fc9;flex:1">
-        <input type="checkbox" id="cDistCheck" onchange="calcularCosto()" style="width:16px;height:16px;accent-color:#7b4fc9;cursor:pointer">
-        Precio para distribuidor
-      </label>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:12px;color:#9b8fc0">Descuento:</span>
-        <input type="number" id="cDistPct" value="10" min="1" max="99" step="1" oninput="calcularCosto()" style="width:60px;border:1px solid #d8d2ea;border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;outline:none;text-align:center">
-        <span style="font-size:12px;color:#9b8fc0">%</span>
-      </div>
-      <div id="cDistResultado" style="font-size:18px;font-weight:700;color:#4a1fa8;display:none"></div>
-    </div>
-
-    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;max-width:560px">
-      <input type="text" id="cNombreProd" placeholder="Nombre del producto para agregar al inventario" style="flex:1;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-      <select id="cCatProd" style="border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;background:#fff">
-        <option value="Hogar">Hogar</option><option value="Mundial 2026">Mundial 2026</option>
-        <option value="F1">F1</option><option value="Merchandising">Merchandising</option>
-        <option value="Niños">Niños</option><option value="Otro">Otro</option>
-      </select>
-      <button class="btn btn-purple" onclick="agregarDesdeCalc()">Agregar al inventario</button>
-    </div>
-  </div>
-</div>
-
-<!-- FILAMENTOS PANEL -->
-<!-- CLIENTES PANEL -->
-<!-- PRODUCCION PANEL -->
-<div class="panel" id="tab-produccion">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
-    <div class="sum-grid" id="prodSumGrid" style="flex:1"></div>
-    <button class="btn btn-purple" onclick="abrirNuevoTrabajo()">+ Nuevo trabajo</button>
-  </div>
-
-  <!-- Kanban -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px" id="prodKanban">
-    <!-- Col En cola -->
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b"></div>
-        <span style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em">En cola</span>
-        <span id="prodBadgeCola" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#fef3c7;color:#92400e;font-weight:600">0</span>
-      </div>
-      <div id="prodColCola" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
-      <button onclick="abrirNuevoTrabajoEstado('cola')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #fcd34d;border-radius:8px;background:transparent;color:#92400e;font-size:12px;cursor:pointer">+ Agregar en cola</button>
-    </div>
-    <!-- Col En producción -->
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="width:10px;height:10px;border-radius:50%;background:#7b4fc9"></div>
-        <span style="font-size:12px;font-weight:700;color:#4a1fa8;text-transform:uppercase;letter-spacing:.06em">En producción</span>
-        <span id="prodBadgeProd" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#f0edf8;color:#7b4fc9;font-weight:600">0</span>
-      </div>
-      <div id="prodColProd" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
-      <button onclick="abrirNuevoTrabajoEstado('produccion')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #c4b5fd;border-radius:8px;background:transparent;color:#7b4fc9;font-size:12px;cursor:pointer">+ Agregar en producción</button>
-    </div>
-    <!-- Col Producido -->
-    <div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="width:10px;height:10px;border-radius:50%;background:#10b981"></div>
-        <span style="font-size:12px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.06em">Producido</span>
-        <span id="prodBadgeListo" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#d1fae5;color:#065f46;font-weight:600">0</span>
-      </div>
-      <div id="prodColListo" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
-      <button onclick="abrirNuevoTrabajoEstado('producido')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #6ee7b7;border-radius:8px;background:transparent;color:#065f46;font-size:12px;cursor:pointer">+ Agregar producido</button>
-    </div>
-  </div>
-
-  <!-- Mobile: lista vertical -->
-  <div id="prodMobile" style="display:none;flex-direction:column;gap:12px"></div>
-</div>
-
-<!-- TRABAJO MODAL -->
-<div id="trabajoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
-  <div style="background:#fff;border-radius:16px;padding:26px;width:92%;max-width:480px;margin:auto;font-family:'Segoe UI',Arial,sans-serif" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <h2 id="trabajoModalTitulo" style="font-size:17px;font-weight:700;color:#1a1a2e">Nuevo trabajo</h2>
-      <button onclick="cerrarTrabajoModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Descripción *</label>
-        <input type="text" id="tjDesc" placeholder="Ej: Copa del Mundo x2 — PLA Rojo" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Cliente</label>
-        <input type="text" id="tjCliente" placeholder="Nombre del cliente" list="tjClienteList" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-        <datalist id="tjClienteList"></datalist>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Estado</label>
-          <select id="tjEstado" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
-            <option value="cola">En cola</option>
-            <option value="produccion">En producción</option>
-            <option value="producido">Producido</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Prioridad</label>
-          <select id="tjPrioridad" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
-            <option value="normal">Normal</option>
-            <option value="urgente">🔴 Urgente</option>
-            <option value="baja">Baja</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Vincular a venta (opcional)</label>
-        <select id="tjVenta" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
-          <option value="">— Sin venta vinculada —</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Notas</label>
-        <textarea id="tjNotas" rows="2" placeholder="Ej: usar 0.2mm, color especial, el cliente pidió acabado mate..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button id="tjBtnEliminar" onclick="eliminarTrabajo()" style="display:none;padding:9px 16px;border-radius:8px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:600;cursor:pointer">Eliminar</button>
-      <button onclick="cerrarTrabajoModal()" style="padding:9px 16px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
-      <button onclick="guardarTrabajo()" style="padding:9px 20px;border-radius:8px;border:none;background:#7b4fc9;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="tab-clientes">
-  <div class="sum-grid" id="clientesSumGrid" style="margin-bottom:20px"></div>
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-    <input type="text" id="clientesBuscar" placeholder="Buscar cliente..." oninput="renderClientes()" style="flex:1;min-width:160px;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:14px;outline:none">
-    <button class="btn btn-purple" onclick="abrirNuevoCliente()">+ Nuevo cliente</button>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Email</th>
-        <th>Compras</th>
-        <th>Última compra</th>
-        <th>Total gastado</th>
-        <th></th>
-      </tr></thead>
-      <tbody id="clientesTbody"></tbody>
-    </table>
-    <div class="mobile-cards" id="clientesMobileCards"></div>
-    <div class="empty" id="clientesEmpty" style="display:none">Sin clientes todavía. Se agregan automáticamente cuando registrás una venta.</div>
-  </div>
-</div>
-
-<!-- CLIENTE DETALLE MODAL -->
-<div id="clienteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
-  <div style="background:#fff;border-radius:16px;padding:26px;width:92%;max-width:560px;margin:auto;font-family:'Segoe UI',Arial,sans-serif" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <h2 id="clienteModalNombre" style="font-size:17px;font-weight:700;color:#1a1a2e"></h2>
-      <button onclick="document.getElementById('clienteModal').style.display='none'" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
-    </div>
-    <div id="clienteModalInfo" style="margin-bottom:16px;font-size:13px;color:#555;line-height:1.8"></div>
-    <div style="font-size:12px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Historial de compras</div>
-    <div id="clienteModalVentas"></div>
-  </div>
-</div>
-
 <!-- VENTAS PANEL -->
 <div class="panel" id="tab-ventas">
 
@@ -683,135 +495,6 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   </div>
 </div>
 
-<!-- DISTRIBUIDORES PANEL -->
-<div class="panel" id="tab-distribuidores">
-
-  <!-- Summary -->
-  <div class="sum-grid" id="distSumGrid" style="margin-bottom:20px"></div>
-
-  <!-- Toolbar -->
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px">
-    <input type="text" id="distBuscar" placeholder="Buscar distribuidor o producto..." oninput="renderDistribuidores()" style="flex:1;min-width:160px;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:14px;outline:none">
-    <select id="distEstadoFilter" onchange="renderDistribuidores()" style="border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;background:#fff">
-      <option value="">Todos los estados</option>
-      <option value="Consignacion">En consignación</option>
-      <option value="Vendido">Vendido</option>
-      <option value="Regresado">Regresado</option>
-    </select>
-    <button class="btn btn-purple" onclick="abrirNuevaConsignacion()">+ Nueva consignación</button>
-  </div>
-
-  <!-- Distribuidores list (grouped view) -->
-  <div id="distGrupos"></div>
-  <div class="empty" id="distEmpty" style="display:none">Sin distribuidores ni consignaciones. Creá la primera con el botón de arriba.</div>
-</div>
-
-<!-- CONSIGNACION MODAL - nuevo flujo en 2 pasos -->
-<div id="consigModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
-  <div style="background:#fff;border-radius:16px;width:92%;max-width:640px;margin:auto;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden" onclick="event.stopPropagation()">
-
-    <!-- Header -->
-    <div style="padding:20px 24px;border-bottom:1px solid #f0edf8;display:flex;align-items:center;justify-content:space-between">
-      <h2 id="consigModalTitulo" style="font-size:17px;font-weight:700;color:#1a1a2e">Nueva consignación</h2>
-      <button onclick="cerrarConsigModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
-    </div>
-
-    <!-- PASO 1: Elegir distribuidor -->
-    <div id="consigPaso1" style="padding:20px 24px">
-      <div style="font-size:12px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">¿Para qué distribuidor?</div>
-
-      <!-- Lista de distribuidores existentes -->
-      <div id="distPickerList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-
-      <!-- Nuevo distribuidor inline -->
-      <div id="nuevoDist" style="border:1px dashed #d8d2ea;border-radius:10px;overflow:hidden">
-        <div onclick="toggleNuevoDist()" style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:8px;background:#fafafa">
-          <span style="font-size:18px">＋</span>
-          <span style="font-size:13px;font-weight:600;color:#7b4fc9">Agregar nuevo distribuidor</span>
-        </div>
-        <div id="nuevoDistForm" style="display:none;padding:14px 16px;border-top:1px solid #f0edf8;display:none">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-            <div>
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Nombre *</label>
-              <input type="text" id="ndNombre" placeholder="Nombre completo" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-            <div>
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Teléfono</label>
-              <input type="text" id="ndTelefono" placeholder="+54911..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-            <div>
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Email</label>
-              <input type="email" id="ndEmail" placeholder="email@ejemplo.com" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-            <div>
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">DNI / CUIT</label>
-              <input type="text" id="ndDni" placeholder="20-12345678-9" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-            <div style="grid-column:1/-1">
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Dirección</label>
-              <input type="text" id="ndDireccion" placeholder="Calle, número, localidad" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-            <div style="grid-column:1/-1">
-              <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Notas</label>
-              <input type="text" id="ndNotas" placeholder="Opcional" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
-            </div>
-          </div>
-          <button onclick="crearYSeleccionarDist()" style="padding:8px 18px;background:#7b4fc9;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Crear y seleccionar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PASO 2: Cargar productos -->
-    <div id="consigPaso2" style="display:none;padding:20px 24px">
-
-      <!-- Distribuidor seleccionado -->
-      <div id="distSeleccionadoBadge" style="background:#f5f0ff;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <div>
-          <div style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Distribuidor</div>
-          <div id="distSelNombre" style="font-size:15px;font-weight:700;color:#4a1fa8"></div>
-          <div id="distSelTel" style="font-size:12px;color:#9b8fc0"></div>
-        </div>
-        <button onclick="volverPaso1()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid #d8d2ea;background:#fff;color:#555;cursor:pointer">Cambiar</button>
-      </div>
-
-      <!-- Fecha -->
-      <div style="margin-bottom:16px">
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Fecha de entrega</label>
-        <input type="date" id="cgFecha" style="border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-      </div>
-
-      <!-- Productos -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Productos en consignación</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <select id="cgProdSelect" style="flex:1;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;background:#fff">
-            <option value="">— Seleccionar producto —</option>
-          </select>
-          <button onclick="agregarItemConsig()" style="padding:9px 16px;background:#7b4fc9;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Agregar</button>
-        </div>
-        <div id="cgItemsLista"></div>
-        <div style="background:#fef3c7;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-          <span style="font-size:13px;color:#92400e;font-weight:600">Total consignación</span>
-          <span style="font-size:22px;font-weight:700;color:#92400e" id="cgTotal">$0</span>
-        </div>
-      </div>
-
-      <!-- Notas -->
-      <div style="margin-bottom:20px">
-        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Notas</label>
-        <textarea id="cgNotas" rows="2" placeholder="Ej: acordar pago a 30 días, entregar en local..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
-      </div>
-
-      <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="consigBtnEliminar" onclick="eliminarConsignacion()" style="display:none;padding:9px 16px;border-radius:8px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:600;cursor:pointer">Eliminar</button>
-        <button onclick="cerrarConsigModal()" style="padding:9px 16px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
-        <button onclick="guardarConsignacion()" style="padding:9px 20px;border-radius:8px;border:none;background:#92400e;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Guardar consignación</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- FILAMENTOS PANEL -->
 <!-- CLIENTES PANEL -->
 <div class="panel" id="tab-clientes">
   <div class="sum-grid" id="clientesSumGrid" style="margin-bottom:20px"></div>
@@ -847,140 +530,6 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
     <div id="clienteModalInfo" style="margin-bottom:16px;font-size:13px;color:#555;line-height:1.8"></div>
     <div style="font-size:12px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Historial de compras</div>
     <div id="clienteModalVentas"></div>
-  </div>
-</div>
-
-<!-- VENTAS PANEL -->
-<div class="panel" id="tab-ventas">
-
-  <!-- Summary -->
-  <div class="sum-grid" id="ventasSumGrid" style="margin-bottom:20px"></div>
-
-  <!-- Toolbar -->
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-    <input type="text" id="ventasBuscar" placeholder="Buscar por cliente, producto..." oninput="renderVentas()" style="flex:1;min-width:160px;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:14px;outline:none">
-    <select id="ventasEstadoFilter" onchange="renderVentas()" style="border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;background:#fff">
-      <option value="">Todos los estados</option>
-      <option value="Presupuesto">Presupuesto</option>
-      <option value="Confirmada">Confirmada</option>
-      <option value="Entregada">Entregada</option>
-      <option value="Cancelada">Cancelada</option>
-    </select>
-    <button class="btn" onclick="importarVentasCSV()" style="font-size:13px">↑ Importar Tienda Nube</button>
-    <input type="file" id="ventasCSVInput" accept=".csv" style="display:none" onchange="procesarVentasCSV(event)">
-    <button class="btn btn-purple" onclick="abrirNuevaVenta()">+ Nueva venta</button>
-  </div>
-
-  <!-- Table -->
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th style="width:8%">#</th>
-        <th style="width:18%">Cliente</th>
-        <th style="width:12%">Fecha</th>
-        <th style="width:20%">Productos</th>
-        <th style="width:10%">Total</th>
-        <th style="width:12%">Estado pago</th>
-        <th style="width:12%">Estado orden</th>
-        <th style="width:8%"></th>
-      </tr></thead>
-      <tbody id="ventasTbody"></tbody>
-    </table>
-    <div class="mobile-cards" id="ventasMobileCards"></div>
-    <div class="empty" id="ventasEmpty" style="display:none">Sin ventas registradas. Creá la primera o importá desde Tienda Nube.</div>
-  </div>
-</div>
-
-<!-- VENTA MODAL -->
-<div id="ventaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
-  <div style="background:#fff;border-radius:16px;padding:26px;width:92%;max-width:620px;margin:auto;font-family:'Segoe UI',Arial,sans-serif" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <h2 id="ventaModalTitulo" style="font-size:17px;font-weight:700;color:#1a1a2e">Nueva venta</h2>
-      <button onclick="cerrarVentaModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
-    </div>
-
-    <!-- Cliente -->
-    <div style="font-size:11px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Datos del cliente</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Nombre</label>
-        <input type="text" id="vNombre" placeholder="Nombre completo" list="clientesDatalist" autocomplete="off" oninput="autocompletarCliente()" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-        <datalist id="clientesDatalist"></datalist>
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Teléfono</label>
-        <input type="text" id="vTelefono" placeholder="+54911..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Email</label>
-        <input type="email" id="vEmail" placeholder="email@ejemplo.com" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Fecha</label>
-        <input type="date" id="vFecha" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-      </div>
-    </div>
-
-    <!-- Productos -->
-    <div style="border-top:1px solid #f0edf8;padding-top:14px;margin-bottom:10px">
-      <div style="font-size:11px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Productos</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <select id="vProdSelect" style="flex:1;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;background:#fff">
-          <option value="">— Seleccionar producto del catálogo —</option>
-        </select>
-        <button onclick="agregarItemVenta()" style="padding:9px 16px;background:#7b4fc9;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Agregar</button>
-      </div>
-      <div id="vItemsLista" style="margin-bottom:10px"></div>
-      <div style="background:#f5f0ff;border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:13px;color:#7b4fc9;font-weight:600">Total</span>
-        <span style="font-size:22px;font-weight:700;color:#4a1fa8" id="vTotal">$0</span>
-      </div>
-    </div>
-
-    <!-- Estado y pago -->
-    <div style="border-top:1px solid #f0edf8;padding-top:14px;margin-bottom:14px">
-      <div style="font-size:11px;font-weight:600;color:#9b8fc0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Estado y pago</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-        <div>
-          <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Estado orden</label>
-          <select id="vEstadoOrden" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;background:#fff">
-            <option value="Presupuesto">Presupuesto</option>
-            <option value="Confirmada">Confirmada</option>
-            <option value="Entregada">Entregada</option>
-            <option value="Cancelada">Cancelada</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Estado pago</label>
-          <select id="vEstadoPago" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;background:#fff">
-            <option value="Pendiente">Pendiente</option>
-            <option value="Recibido">Recibido</option>
-            <option value="Reembolsado">Reembolsado</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Medio de pago</label>
-          <select id="vMedioPago" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;background:#fff">
-            <option value="Efectivo">Efectivo</option>
-            <option value="Transferencia">Transferencia</option>
-            <option value="Mercado Pago">Mercado Pago</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notas -->
-    <div style="margin-bottom:18px">
-      <label style="font-size:11px;color:#9b8fc0;display:block;margin-bottom:3px">Notas</label>
-      <textarea id="vNotas" placeholder="Notas internas..." rows="2" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button id="ventaBtnEliminar" onclick="eliminarVenta()" style="display:none;padding:9px 16px;border-radius:8px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:600;cursor:pointer">Eliminar</button>
-      <button onclick="cerrarVentaModal()" style="padding:9px 16px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
-      <button onclick="guardarVenta()" style="padding:9px 20px;border-radius:8px;border:none;background:#7b4fc9;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Guardar venta</button>
-    </div>
   </div>
 </div>
 
@@ -1083,6 +632,105 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   </div>
 </div>
 
+<!-- PRODUCCION PANEL -->
+<div class="panel" id="tab-produccion">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <div class="sum-grid" id="prodSumGrid" style="flex:1;min-width:200px"></div>
+    <button class="btn btn-purple" onclick="abrirNuevoTrabajo()" style="white-space:nowrap">+ Nuevo trabajo</button>
+  </div>
+
+  <!-- Kanban -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="prodKanban" class="prod-kanban">
+    <!-- Col En cola -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#f59e0b"></div>
+        <span style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em">En cola</span>
+        <span id="prodBadgeCola" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#fef3c7;color:#92400e;font-weight:600">0</span>
+      </div>
+      <div id="prodColCola" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('cola')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #fcd34d;border-radius:8px;background:transparent;color:#92400e;font-size:12px;cursor:pointer">+ Agregar en cola</button>
+    </div>
+    <!-- Col En producción -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#7b4fc9"></div>
+        <span style="font-size:12px;font-weight:700;color:#4a1fa8;text-transform:uppercase;letter-spacing:.06em">En producción</span>
+        <span id="prodBadgeProd" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#f0edf8;color:#7b4fc9;font-weight:600">0</span>
+      </div>
+      <div id="prodColProd" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('produccion')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #c4b5fd;border-radius:8px;background:transparent;color:#7b4fc9;font-size:12px;cursor:pointer">+ Agregar en producción</button>
+    </div>
+    <!-- Col Producido -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#10b981"></div>
+        <span style="font-size:12px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.06em">Producido</span>
+        <span id="prodBadgeListo" style="font-size:11px;padding:1px 7px;border-radius:8px;background:#d1fae5;color:#065f46;font-weight:600">0</span>
+      </div>
+      <div id="prodColListo" style="display:flex;flex-direction:column;gap:10px;min-height:100px"></div>
+      <button onclick="abrirNuevoTrabajoEstado('producido')" style="margin-top:8px;width:100%;padding:7px;border:1px dashed #6ee7b7;border-radius:8px;background:transparent;color:#065f46;font-size:12px;cursor:pointer">+ Agregar producido</button>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- TRABAJO MODAL -->
+<div id="trabajoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+  <div style="background:#fff;border-radius:16px;padding:26px;width:92%;max-width:480px;margin:auto;font-family:'Segoe UI',Arial,sans-serif" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h2 id="trabajoModalTitulo" style="font-size:17px;font-weight:700;color:#1a1a2e">Nuevo trabajo</h2>
+      <button onclick="cerrarTrabajoModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9b8fc0">&#x2715;</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Descripción *</label>
+        <input type="text" id="tjDesc" placeholder="Ej: Copa del Mundo x2 — PLA Rojo" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Cliente</label>
+        <input type="text" id="tjCliente" placeholder="Nombre del cliente" list="tjClienteList" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+        <datalist id="tjClienteList"></datalist>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Estado</label>
+          <select id="tjEstado" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+            <option value="cola">En cola</option>
+            <option value="produccion">En producción</option>
+            <option value="producido">Producido</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Prioridad</label>
+          <select id="tjPrioridad" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+            <option value="normal">Normal</option>
+            <option value="urgente">🔴 Urgente</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Vincular a venta (opcional)</label>
+        <select id="tjVenta" style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
+          <option value="">— Sin venta vinculada —</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#9b8fc0;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Notas</label>
+        <textarea id="tjNotas" rows="2" placeholder="Ej: usar 0.2mm, color especial, el cliente pidió acabado mate..." style="width:100%;border:1px solid #d8d2ea;border-radius:8px;padding:9px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="tjBtnEliminar" onclick="eliminarTrabajo()" style="display:none;padding:9px 16px;border-radius:8px;border:1px solid #fca5a5;background:#fee2e2;color:#991b1b;font-size:13px;font-weight:600;cursor:pointer">Eliminar</button>
+      <button onclick="cerrarTrabajoModal()" style="padding:9px 16px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:13px;font-weight:600;cursor:pointer">Cancelar</button>
+      <button onclick="guardarTrabajo()" style="padding:9px 20px;border-radius:8px;border:none;background:#7b4fc9;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Guardar</button>
+    </div>
+  </div>
+</div>
 <div class="panel" id="tab-filamentos">
   <div class="sum-grid" id="filSumGrid" style="margin-bottom:20px"></div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
@@ -1243,16 +891,58 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:14px;padding:24px;width:90%;max-width:360px;font-family:'Segoe UI',Arial,sans-serif;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-    <div style="font-size:32px;margin-bottom:10px">⚠️</div>
-    <div id="confirmMsg" style="font-size:15px;color:#1a1a2e;font-weight:500;margin-bottom:20px;line-height:1.4"></div>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <button onclick="resolverConfirm(false)" style="flex:1;padding:10px;border-radius:8px;border:1px solid #d8d2ea;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer">Cancelar</button>
-      <button onclick="resolverConfirm(true)" style="flex:1;padding:10px;border-radius:8px;border:none;background:#ef4444;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Eliminar</button>
+<!-- CALCULADORA -->
+<div class="panel" id="tab-calculadora">
+  <div class="calc-box">
+    <h3>Calculadora de precio desde costo</h3>
+    <div class="calc-row"><label>Horas de impresión</label><input type="number" id="cHoras" value="4" min="0.1" step="0.5" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">hs</span></div>
+    <div class="calc-row"><label>Filamento usado</label><input type="number" id="cGramos" value="80" min="1" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">gramos</span></div>
+    <div class="calc-row"><label>Precio filamento (kg)</label><input type="number" id="cFilamento" value="25000" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$/kg</span></div>
+    <div class="calc-row"><label>Consumo impresora</label><input type="number" id="cWatts" value="200" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">watts</span></div>
+    <div class="calc-row"><label>Precio kWh</label><input type="number" id="cKwh" value="227" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$/kWh</span></div>
+    <div class="calc-row"><label>Gastos adicionales</label><input type="number" id="cExtras" value="0" min="0" oninput="calcularCosto()"><span style="font-size:13px;color:#9b8fc0">$</span></div>
+    <div style="border-top:1px solid #f0edf8;margin:12px 0"></div>
+    <div style="font-size:12px;color:#9b8fc0;margin-bottom:8px">Desglose:</div>
+    <div id="cDesglose" style="font-size:13px;color:#555;line-height:2;background:#fafafa;border-radius:8px;padding:10px 14px;margin-bottom:10px"></div>
+
+    <!-- Precio público -->
+    <div class="calc-result" style="max-width:560px">
+      <div>
+        <div class="r-label">Precio sugerido de venta</div>
+        <div style="font-size:12px;color:#9b8fc0;margin-top:2px" id="cFormula"></div>
+      </div>
+      <div class="r-val" id="cResultado">$0</div>
+    </div>
+
+    <!-- Toggle distribuidor -->
+    <div style="max-width:560px;margin-top:10px;background:#f5f0ff;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:#7b4fc9;flex:1">
+        <input type="checkbox" id="cDistCheck" onchange="calcularCosto()" style="width:16px;height:16px;accent-color:#7b4fc9;cursor:pointer">
+        Precio para distribuidor
+      </label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:12px;color:#9b8fc0">Descuento:</span>
+        <input type="number" id="cDistPct" value="10" min="1" max="99" step="1" oninput="calcularCosto()" style="width:60px;border:1px solid #d8d2ea;border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;outline:none;text-align:center">
+        <span style="font-size:12px;color:#9b8fc0">%</span>
+      </div>
+      <div id="cDistResultado" style="font-size:18px;font-weight:700;color:#4a1fa8;display:none"></div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;max-width:560px">
+      <input type="text" id="cNombreProd" placeholder="Nombre del producto para agregar al inventario" style="flex:1;border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none">
+      <select id="cCatProd" style="border:1px solid #d8d2ea;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;background:#fff">
+        <option value="Hogar">Hogar</option><option value="Mundial 2026">Mundial 2026</option>
+        <option value="F1">F1</option><option value="Merchandising">Merchandising</option>
+        <option value="Niños">Niños</option><option value="Otro">Otro</option>
+      </select>
+      <button class="btn btn-purple" onclick="agregarDesdeCalc()">Agregar al inventario</button>
     </div>
   </div>
+</div><!-- RENTABILIDAD -->
+<div class="panel" id="tab-rentabilidad">
+  <div class="rent-grid" id="rentGrid"></div>
+  <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Productos más valiosos (precio público)</h3>
+  <div id="topProds"></div>
 </div>
 
 <!-- PRESUPUESTO PANEL -->
@@ -1485,7 +1175,7 @@ td textarea{resize:vertical;min-height:50px;white-space:normal}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA2SM4_qEEcHvC_9hzPtKAJUn6S6ww47LE",
@@ -1499,70 +1189,82 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 
-// ===== FIREBASE SYNC =====
-// All collections stored as single documents for simplicity
-const COLECCIONES = ['skycom_ventas','skycom_clientes','skycom_filamentos_v2','skycom_movimientos_fil','skycom_fils_v3','skycom_movs_v3','skycom_usuarios','skycom_inv2','skycom_consigs','skycom_presupuestos','skycom_trabajos','skycom_papelera'];
+const COLECCIONES = [
+  'skycom_ventas','skycom_clientes','skycom_filamentos_v2','skycom_movimientos_fil',
+  'skycom_fils_v3','skycom_movs_v3','skycom_usuarios','skycom_inv2',
+  'skycom_consigs','skycom_trabajos','skycom_papelera','skycom_presupuestos'
+];
+
+const MAX_SIZE = 900000; // ~900KB safe limit for Firestore
 
 async function fbGuardar(key, data){
   try {
-    await setDoc(doc(db, 'crm', key), { data: JSON.stringify(data) });
-  } catch(e){ console.warn('Firebase write error:', e); }
+    let jsonStr = JSON.stringify(data);
+    // If too large (e.g. presupuestos with images), strip imgData
+    if(jsonStr.length > MAX_SIZE && Array.isArray(data)){
+      const sinImg = data.map(p=>{ const {imgData,...rest}=p; return rest; });
+      jsonStr = JSON.stringify(sinImg);
+    }
+    if(jsonStr.length > MAX_SIZE){ console.warn('Dato demasiado grande para Firebase:', key); return; }
+    await setDoc(doc(db, 'crm', key), { data: jsonStr });
+  } catch(e){ console.warn('Firebase write error:', key, e); }
 }
 
 async function fbLeer(key){
   try {
     const snap = await getDoc(doc(db, 'crm', key));
     if(snap.exists()) return JSON.parse(snap.data().data);
-  } catch(e){ console.warn('Firebase read error:', e); }
+  } catch(e){ console.warn('Firebase read error:', key, e); }
   return null;
 }
 
-async function sincronizarDesdeFirebase(){
-  console.log('Sincronizando desde Firebase...');
-  for(const key of COLECCIONES){
-    try {
-      const data = await fbLeer(key);
-      if(data !== null){
-        // Use _origSetItem to avoid triggering the override loop
-        _origSetItem(key, JSON.stringify(data));
-      }
-    } catch(e){ console.warn('Error leyendo '+key, e); }
-  }
-  console.log('Sincronización completa.');
-}
+// Expose to window so main script can use them
+window._fbGuardar = fbGuardar;
+window._fbLeer = fbLeer;
+window._fbColecciones = COLECCIONES;
 
-// Override localStorage setItem to also save to Firebase
+// Override localStorage.setItem HERE in the module scope
+// This works because module scripts run before DOMContentLoaded
 const _origSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function(key, value){
   _origSetItem(key, value);
   if(COLECCIONES.includes(key)){
-    try {
-      fbGuardar(key, JSON.parse(value));
-    } catch(e){}
+    try { fbGuardar(key, JSON.parse(value)); } catch(e){}
   }
 };
+window._origSetItem = _origSetItem;
 
-// On load: sync from Firebase first, then render
-window._fbReady = false;
-sincronizarDesdeFirebase().then(()=>{
-  window._fbReady = true;
-  // Trigger re-render if app already loaded
-  if(typeof render === 'function') render();
-  if(typeof renderVentas === 'function'){
-    const activeTab = document.querySelector('.tab.active');
-    if(activeTab) activeTab.click();
+// Sync from Firebase on load - runs immediately
+async function sincronizarDesdeFirebase(){
+  const ind = document.getElementById('fbSyncIndicator');
+  if(ind){ ind.textContent = '↻ Sincronizando...'; ind.style.color='#9b8fc0'; }
+  console.log('[Firebase] Sincronizando...');
+  let ok = 0;
+  for(const key of COLECCIONES){
+    try {
+      const data = await fbLeer(key);
+      if(data !== null){
+        _origSetItem(key, JSON.stringify(data));
+        ok++;
+      }
+    } catch(e){ console.warn('[Firebase] Error leyendo', key, e); }
   }
-  // Show sync indicator
-  const ind = document.getElementById('fbSyncIndicator');
-  if(ind){ ind.textContent = '✓ Firebase OK'; ind.style.color='#065f46'; setTimeout(()=>{ ind.textContent=''; },4000); }
-}).catch(e=>{ 
-  const ind = document.getElementById('fbSyncIndicator');
-  if(ind){ ind.textContent = '⚠ Sin Firebase'; ind.style.color='#991b1b'; }
-  console.warn('Firebase sync failed:', e);
-});
+  console.log('[Firebase] Sync completo:', ok, 'colecciones');
+  if(ind){ ind.textContent = '✓ Sincronizado'; ind.style.color='#065f46'; setTimeout(()=>{ if(ind) ind.textContent=''; },3000); }
+  // Re-render everything
+  if(typeof render === 'function') render();
+  if(typeof renderVentas === 'function') renderVentas();
+  if(typeof renderClientes === 'function') renderClientes();
+  const activeTab = document.querySelector && document.querySelector('.tab.active');
+  if(activeTab) activeTab.click();
+}
 
-window._fbGuardar = fbGuardar;
-window._fbLeer = fbLeer;
+// Wait for DOM then sync
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', sincronizarDesdeFirebase);
+} else {
+  sincronizarDesdeFirebase();
+}
 </script>
 
 <script>
@@ -1657,7 +1359,7 @@ function setTab(id, el){
 function getFiltered(){
   const q=(document.getElementById('buscar')||{value:''}).value.toLowerCase();
   const est=(document.getElementById('filtEstado')||{value:''}).value;
-  const catF=(document.getElementById('filtroCat')||{value:''}).value;
+  const catF=catActiva==='Todas'?'':(catActiva||'');
   const mn=parseFloat((document.getElementById('precMin')||{value:''}).value)||0;
   const mx=parseFloat((document.getElementById('precMax')||{value:''}).value)||Infinity;
   return prods.filter(p=>
@@ -1682,13 +1384,22 @@ function renderSummary(){
 }
 
 function renderCats(){
-  const todas=['Todas',...new Set(prods.map(p=>p.cat))];
+  const todas=['Todas',...new Set(prods.map(p=>p.cat).filter(Boolean))].sort((a,b)=>a==='Todas'?-1:b==='Todas'?1:a.localeCompare(b));
   document.getElementById('catPills').innerHTML=todas.map(c=>
-    '<span class="cat-pill'+(catActiva===c?' active':'')+'" onclick="setCat(\''+c+'\')">'+c+'</span>'
+    '<span class="cat-pill'+(catActiva===c?' active':'')+'" data-cat="'+encodeURIComponent(c)+'" onclick="setCatBtn(this)">'+c+'</span>'
   ).join('');
 }
 
-function setCat(c){ catActiva=c; render(); }
+function setCatBtn(el){
+  setCat(decodeURIComponent(el.dataset.cat));
+}
+
+function setCat(c){
+  catActiva=c;
+  const fc=document.getElementById('filtroCat');
+  if(fc) fc.value=(c==='Todas'?'':c);
+  render();
+}
 
 function render(){
   renderSummary(); renderCats(); actualizarSelectsCat();
@@ -3385,7 +3096,14 @@ function pqImprimir(){
 
 
 function getPQs(){ return JSON.parse(localStorage.getItem('skycom_presupuestos')||'[]'); }
-function savePQs(a){ localStorage.setItem('skycom_presupuestos',JSON.stringify(a)); }
+function savePQs(a){
+  localStorage.setItem('skycom_presupuestos',JSON.stringify(a));
+  // Save to Firebase WITHOUT imgData (too large for Firestore 1MB limit)
+  try {
+    const sinImg = a.map(p=>{ const {imgData,...rest}=p; return rest; });
+    window._fbGuardar && window._fbGuardar('skycom_presupuestos', sinImg);
+  } catch(e){}
+}
 
 function pqGuardar(){
   const el = document.getElementById('pqDoc');
@@ -3704,10 +3422,12 @@ function renderProduccion(){
     document.getElementById(cfg.col).appendChild(card);
   });
 
-  // Mobile check
-  const isMobile=window.innerWidth<640;
-  document.getElementById('prodKanban').style.display=isMobile?'none':'grid';
-  document.getElementById('prodMobile').style.display=isMobile?'flex':'none';
+  // Mobile: show as single column stack instead of 3-col grid
+  const isMobile=window.innerWidth<700;
+  const kanban=document.getElementById('prodKanban');
+  kanban.style.display='grid';
+  kanban.style.gridTemplateColumns=isMobile?'1fr':'1fr 1fr 1fr';
+  document.getElementById('prodMobile').style.display='none';
 }
 
 function avanzarTrabajo(id){
@@ -4049,7 +3769,18 @@ function parsearLineaCSV(line){
 
 function limpiarPrecio(s){
   if(!s) return 0;
-  return parseFloat(s.replace(/\./g,'').replace(',','.').replace(/[^0-9.]/g,''))||0;
+  s = s.toString().replace(/['"]/g,'').trim();
+  // Format: "11,300.00" (comma=thousands, dot=decimal) → most common from TiendaNube
+  if(/^[\d,]+\.\d+$/.test(s) || /^[\d,]+$/.test(s)){
+    // Remove commas (thousands separator) then parse
+    return Math.round(parseFloat(s.replace(/,/g,'')))||0;
+  }
+  // Format: "11.300,00" (dot=thousands, comma=decimal) → less common
+  if(/^[\d.]+,\d+$/.test(s)){
+    return Math.round(parseFloat(s.replace(/\./g,'').replace(',','.')))||0;
+  }
+  // Fallback: strip everything except digits and last separator
+  return Math.round(parseFloat(s.replace(/[^0-9.,]/g,'').replace(',','.'))||0);
 }
 
 function getCategorias(){
