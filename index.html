@@ -2380,10 +2380,7 @@ function procesarVentasCSV(e){
   const reader=new FileReader();
   reader.onload=function(ev){
     try {
-      // Decode latin-1
-      const bytes=new Uint8Array(ev.target.result);
-      let text='';
-      for(let i=0;i<bytes.length;i++) text+=String.fromCharCode(bytes[i]);
+      const text=ev.target.result;
       const lines=text.split('\n').filter(l=>l.trim());
       if(lines.length<2){ alert('CSV vacío o sin datos'); return; }
       const cols=lines[0].split(';').map(c=>c.replace(/"/g,'').trim());
@@ -2440,8 +2437,7 @@ function procesarVentasCSV(e){
       mostrarResultado(agregadas.length+' venta'+(agregadas.length!==1?'s':'')+' importada'+(agregadas.length!==1?'s':'')+' de Tienda Nube.','ok');
     } catch(err){ alert('Error al procesar el CSV: '+err.message); }
   };
-  reader.readAsArrayBuffer(file);
-  e.target.value='';
+  reader.readAsText(file, 'ISO-8859-1');
 }
 
 
@@ -3256,7 +3252,7 @@ async function restaurarBackup(e){
       alert('Error al leer el backup: ' + err.message);
     }
   };
-  reader.readAsArrayBuffer(file);
+  reader.readAsText(file, 'UTF-8');
   e.target.value = '';
 }
 
@@ -3842,7 +3838,16 @@ function procesarCSV(e){
   reader.onload = function(ev){
     const text = ev.target.result;
     const lines = text.split('\n').filter(l=>l.trim());
-    if(lines.length < 2){ mostrarResultado('CSV vacío o inválido.','error'); return; }
+    if(lines.length < 2){ 
+      mostrarResultado('CSV inválido. Líneas detectadas: '+lines.length+'. Verificá que sea el archivo correcto de Tienda Nube.','error'); 
+      console.error('CSV lines:', lines.length, 'First 200 chars:', text.substring(0,200));
+      return; 
+    }
+    // Also verify it has semicolons (TiendaNube format)
+    if(!lines[0].includes(';')){ 
+      mostrarResultado('El CSV no tiene el formato correcto. Debe usar punto y coma (;) como separador.','error'); 
+      return; 
+    }
 
     // Detectar columnas del header
     const header = parsearLineaCSV(lines[0]);
