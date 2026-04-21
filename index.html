@@ -3241,7 +3241,7 @@ async function restaurarBackup(e){
       alert('Error al leer el backup: ' + err.message);
     }
   };
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
   e.target.value = '';
 }
 
@@ -3825,11 +3825,18 @@ function procesarCSV(e){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(ev){
-    let text = ev.target.result;
-    // Fix encoding
-    text = text.replace(/\\xed/g,'í').replace(/\\xf3/g,'ó').replace(/\\xf1/g,'ñ')
-               .replace(/\\xe9/g,'é').replace(/\\xe1/g,'á').replace(/\\xfa/g,'ú')
-               .replace(/\\xfc/g,'ü');
+    // Decode as latin-1 (ISO-8859-1) to handle Spanish special chars
+    const bytes = new Uint8Array(ev.target.result);
+    let text = '';
+    for(let i=0;i<bytes.length;i++) text += String.fromCharCode(bytes[i]);
+    // Convert latin-1 special chars to proper unicode
+    text = text
+      .replace(/ñ/g,'ñ').replace(/Ñ/g,'Ñ')
+      .replace(/á/g,'á').replace(/é/g,'é').replace(/í/g,'í')
+      .replace(/ó/g,'ó').replace(/ú/g,'ú').replace(/ü/g,'ü')
+      .replace(/Á/g,'Á').replace(/É/g,'É').replace(/Í/g,'Í')
+      .replace(/Ó/g,'Ó').replace(/Ú/g,'Ú').replace(/Ü/g,'Ü')
+      .replace(/¿/g,'¿').replace(/¡/g,'¡');
 
     const lines = text.split('\n').filter(l=>l.trim());
     if(lines.length < 2){ mostrarResultado('CSV vacío o inválido.','error'); return; }
@@ -3867,11 +3874,13 @@ function procesarCSV(e){
       const precioOrig = limpiarPrecio(idx.precio>=0 ? cols[idx.precio] : '');
       const precioPromo = limpiarPrecio(idx.precioPromo>=0 ? cols[idx.precioPromo] : '');
       const precio = precioPromo > 0 ? precioPromo : precioOrig;
-      const stock = idx.stock>=0 ? parseInt(cols[idx.stock])||0 : 0;
+      const stockRaw = idx.stock>=0 ? cols[idx.stock].replace(/["']/g,'').trim() : '';
+      const stockInfinito = stockRaw === ''; // Empty = unlimited stock in TiendaNube
+      const stock = stockInfinito ? 999 : (parseInt(stockRaw)||0);
       const visible = idx.visible>=0 ? cols[idx.visible].toUpperCase()==='SI' : true;
       const costo = limpiarPrecio(idx.costo>=0 ? cols[idx.costo] : '');
       const cat = limpiarCat(catRaw);
-      const estado = !visible ? 'pausado' : (stock===0 ? 'agotado' : 'activo');
+      const estado = !visible ? 'pausado' : (stock===0 && !stockInfinito ? 'agotado' : 'activo');
       const urlId = idx.url>=0 ? cols[idx.url].replace(/^"|"$/g,'').trim() : '';
       const link = urlId ? 'https://skycom.studio/productos/'+urlId+'/' : '';
 
